@@ -9,12 +9,14 @@ public class ConverterRunner {
             x = converterController.convertValues("usd", "btc", 1);
             System.out.println(x);
 
-        }catch (IOException ioe){
-
-        }catch (CurrencyNotFoundException ce){
-
         }
-
+        catch (CurrencyNotFoundException ce){
+        System.out.println(ce.getMessage());
+    }
+        catch (IOException ioe)
+    {
+        System.out.println(ioe.getMessage());
+    }
 
     }
 }

@@ -5,10 +5,16 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ControllerTests {
 
     @Test
-    void shouldReturnIfACurrencyExistsInTheList() throws IOException {
+    void shouldReturnTrueIfACurrencyExistsInTheList() throws IOException, CurrencyNotFoundException{
         var convertController = new ConverterController();
-        boolean t = convertController.currencyIsValid("USD");
-        assertEquals(true, t);
+        assertTrue(convertController.currencyIsValid("USD"));
+        assertTrue(convertController.currencyIsValid("BRL"));
+    }
+
+    @Test
+    void shouldThrowsAnCurrencyNotFoundExceptionWhenCurrencyIsWrong() {
+        var convertController = new ConverterController();
+        assertThrows(CurrencyNotFoundException.class, () -> convertController.currencyIsValid("01"));
     }
 
 

@@ -6,9 +6,8 @@ public class ConverterRunner {
         ConverterController converterController = new ConverterController();
         try{
             float x;
-            x = converterController.convertValues("usd", "btc", 1);
+            x = converterController.convertValues("btc", "usd", 1);
             System.out.println(x);
-
         }
         catch (CurrencyNotFoundException ce){
         System.out.println(ce.getMessage());

@@ -16,9 +16,10 @@ public class ConverterController {
     private OkHttpClient apiClient = null;
     private ArrayList<String> currenciesList = null;
 
-    public float convertValues(String toCurrencyCode, String fromCurrencyCode, float amount) throws IOException, CurrencyNotFoundException{
-        String toCurrency = formatCurrencyCode(toCurrencyCode);
+    public float convertValues(String fromCurrencyCode, String toCurrencyCode,  float amount) throws IOException, CurrencyNotFoundException{
+
         String fromCurrency = formatCurrencyCode(fromCurrencyCode);
+        String toCurrency = formatCurrencyCode(toCurrencyCode);
 
         if(toCurrency.equals(fromCurrency)){
             return 1.0f;
@@ -54,6 +55,7 @@ public class ConverterController {
         currenciesList = new ArrayList<>();
 
         Response response = fetchCurrencyList();
+
         try {
             //usando gson, vamos transformar as moedas do json retornado em strings legiveis
             Gson gsonParser = new Gson();
@@ -85,11 +87,12 @@ public class ConverterController {
     public boolean currencyIsValid(String currency) throws IOException, CurrencyNotFoundException{
         try {
             currenciesList = loadCurrencyList();
-            for (String validCurrency : currenciesList) {
-                if (validCurrency.equals(currency))
-                    return true;
+            boolean status = binarySearch(currency);
+            if(status == true){
+                return true;
+            }else {
+                throw new CurrencyNotFoundException();
             }
-            throw new CurrencyNotFoundException();
         }
         finally {
             //limpando a lista após encontrar a moeda ou jogar a excessão
@@ -98,6 +101,29 @@ public class ConverterController {
         }
     }
 
+    private boolean binarySearch(String currency) throws IOException{
+        int inicio = 0;
+        int fim = loadCurrencyList().size() - 1;
+        while(inicio <= fim){
+            int meio = (inicio + fim) / 2;
+            String midCurrency = currenciesList.get(meio);
+
+            int comparison = midCurrency.compareTo(currency);
+
+            if(comparison == 0){
+                return true;
+            }
+            else if(comparison < 0){
+                inicio = meio + 1;
+            }
+            else  {
+                fim = meio - 1;
+            }
+        }
+        return false;
+    }
+
+    //TODO: deixar isso aqui mais eficaz - abstraindo o fileName para um Path
     private String getApiKey() throws IOException {
         BufferedReader reader = null;
         try {

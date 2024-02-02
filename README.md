@@ -21,10 +21,11 @@
 </ul>
 
 <h2>API used to fetch data</h2>
+<p>
 <ul>
 	<li><a href="https://apilayer.com/marketplace/currency_data-api"</li>
 </ul>
-
+</p>
 <h2>Class Summaries</h2>
 
 <h3>1.0. ConverterRunner </h3>

@@ -5,23 +5,27 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ControllerTests {
 
     @Test
-    void shouldReturnTrueIfACurrencyExistsInTheList() throws IOException, CurrencyNotFoundException{
-        var convertController = new ConverterController();
-        assertTrue(convertController.currencyIsValid("EUR"));
-        assertTrue(convertController.currencyIsValid("BRL"));
+    void shouldReturnAValidListOfCurrencies() throws IOException{
+        var controller = new ConverterController();
+        assertNotNull(controller.loadCurrencyList());
     }
 
     @Test
-    void shouldThrowsAnCurrencyNotFoundExceptionWhenCurrencyIsWrong() {
-        var convertController = new ConverterController();
-        assertThrows(CurrencyNotFoundException.class, () -> convertController.currencyIsValid("01"));
-    }
-
-    @Test
-    void assertThatSameCurrenciesHaveTheSameValue() throws  IOException, CurrencyNotFoundException{
+    void assertThatSameCurrenciesHaveTheSameValue() throws IOException, CurrencyNotFoundException{
         var controller = new ConverterController();
         assertEquals( 1f, controller.convertValues("USD", "USD", 1));
     }
 
+    @Test
+    void shouldReturnValidConversionResult() throws IOException, CurrencyNotFoundException{
+        var controller = new ConverterController();
+        assertNotNull(controller.convertValues("USD","EUR",10));
+    }
+
+    @Test
+    void shouldThrowCurrencyNotFoundExceptionWhenCurrencyCodeIsNotValid() throws IOException {
+        var controller = new ConverterController();
+        assertThrows(CurrencyNotFoundException.class, () -> controller.convertValues("USD", "XYZ", 1));
+    }
 
 }

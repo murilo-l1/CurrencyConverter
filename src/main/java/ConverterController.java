@@ -4,7 +4,6 @@ import com.google.gson.JsonObject;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -17,19 +16,15 @@ public class ConverterController {
     private ArrayList<String> currenciesList = null;
 
     public float convertValues(String fromCurrencyCode, String toCurrencyCode,  float amount) throws IOException, CurrencyNotFoundException{
-
-        String fromCurrency = formatCurrencyCode(fromCurrencyCode);
-        String toCurrency = formatCurrencyCode(toCurrencyCode);
-
-        if(toCurrency.equals(fromCurrency)){
-            return 1.0f;
+        if(toCurrencyCode.equals(fromCurrencyCode)){
+            return amount;
         }
-
-        if(currencyIsValid(toCurrency) && currencyIsValid(fromCurrency)){
-
+        if(!currencyIsValid(fromCurrencyCode) || !currencyIsValid(toCurrencyCode)){
+            throw new CurrencyNotFoundException(fromCurrencyCode + " or " + toCurrencyCode + "were not found in our database");
+        }
             apiClient = new OkHttpClient().newBuilder().build();
             Request request = new Request.Builder()
-                    .url("https://api.apilayer.com/currency_data/convert?to=" + toCurrency + "&from=" + fromCurrency + "&amount=" + amount )
+                    .url("https://api.apilayer.com/currency_data/convert?to=" + toCurrencyCode + "&from=" + fromCurrencyCode + "&amount=" + amount )
                     .addHeader("apikey", getApiKey())
                     .method("GET", null)
                     .build();
@@ -40,15 +35,12 @@ public class ConverterController {
 
             float convertedValue = jsonObject.getAsJsonPrimitive("result").getAsFloat();
             return convertedValue;
-        }else {
-            throw new CurrencyNotFoundException();
-        }
     }
 
-    private String formatCurrencyCode(String currencyCode){
-        return currencyCode.replaceAll(" ", "").toUpperCase();
+    private boolean currencyIsValid(String currencyCode) throws IOException{
+        currenciesList = loadCurrencyList();
+        return currenciesList.contains(currencyCode);
     }
-
 
     public ArrayList<String> loadCurrencyList() throws IOException{
         apiClient = new OkHttpClient().newBuilder().build();
@@ -84,61 +76,22 @@ public class ConverterController {
         return apiClient.newCall(request).execute();
     }
 
-    public boolean currencyIsValid(String currency) throws IOException, CurrencyNotFoundException{
-        try {
-            currenciesList = loadCurrencyList();
-            boolean status = binarySearch(currency);
-            if(status == true){
-                return true;
-            }else {
-                throw new CurrencyNotFoundException();
-            }
-        }
-        finally {
-            //limpando a lista após encontrar a moeda ou jogar a excessão
-            if(currenciesList != null)
-                currenciesList.clear();
-        }
-    }
-
-    private boolean binarySearch(String currency) throws IOException{
-        int inicio = 0;
-        int fim = loadCurrencyList().size() - 1;
-        while(inicio <= fim){
-            int meio = (inicio + fim) / 2;
-            String midCurrency = currenciesList.get(meio);
-
-            int comparison = midCurrency.compareTo(currency);
-
-            if(comparison == 0){
-                return true;
-            }
-            else if(comparison < 0){
-                inicio = meio + 1;
-            }
-            else  {
-                fim = meio - 1;
-            }
-        }
-        return false;
-    }
-
-    //TODO: deixar isso aqui mais eficaz - abstraindo o fileName para um Path
     private String getApiKey() throws IOException {
         BufferedReader reader = null;
         try {
-            reader = new BufferedReader(new FileReader("C:\\Users\\muril\\IdeaProjects\\CurrencyConverter\\src\\main\\assets\\apikey.txt"));
+            String filePath = "src/main/assets/apikey.txt";
+            reader = new BufferedReader(new FileReader(filePath));
             String apiKey = reader.readLine();
             return apiKey;
         } catch (IOException ioe) {
-            System.out.println("Error: " + ioe);
+            System.err.println("Error: " + ioe);
         } catch (Exception e) {
-            System.out.println("Error: " + e);
+            System.err.println("Error: " + e);
         } finally {
             try {
                 if(reader != null) reader.close();
             }catch (NullPointerException e){
-                System.out.println("Error: " + e);
+                System.err.println("Error: " + e);
             }
         }
         return null;

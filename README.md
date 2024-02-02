@@ -18,14 +18,9 @@
   <li>Java 21</li>
   <li><a href="https://github.com/google/gson">Gson</a> - Used to parse and read through JSON data</li>
   <li><a href="https://square.github.io/okhttp/3.x/okhttp/okhttp3/OkHttpClient.html">OkHttpClient</a>: Library used for making HTTP requests to fetch data from the external API.</li>
+  <li><a href="https://apilayer.com/marketplace/currency_data-api">API</a>: API used to fetch data.</li>
 </ul>
 
-<h2>API used to fetch data</h2>
-<p>
-<ul>
-	<li><a href="https://apilayer.com/marketplace/currency_data-api"</li>
-</ul>
-</p>
 <h2>Class Summaries</h2>
 
 <h3>1.0. ConverterRunner </h3>
